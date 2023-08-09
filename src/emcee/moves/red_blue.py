@@ -49,7 +49,7 @@ class RedBlueMove(Move):
             "The proposal must be implemented by " "subclasses"
         )
 
-    def propose(self, model, state):
+    def propose(self, model, state, temperature=lambda _: 1.0):
         """Use the move to generate a proposal and compute the acceptance
 
         Args:
@@ -97,7 +97,7 @@ class RedBlueMove(Move):
                 zip(all_inds[S1], factors, new_log_probs)
             ):
                 lnpdiff = f + nlp - state.log_prob[j]
-                if lnpdiff > np.log(model.random.rand()):
+                if lnpdiff > temperature * np.log(model.random.rand()):
                     accepted[j] = True
 
             new_state = State(q, log_prob=new_log_probs, blobs=new_blobs)
