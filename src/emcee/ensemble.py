@@ -82,6 +82,7 @@ class EnsembleSampler(object):
         vectorize=False,
         blobs_dtype=None,
         parameter_names: Optional[Union[Dict[str, int], List[str]]] = None,
+        temperature=lambda _: 1.0,
         # Deprecated...
         a=None,
         postargs=None,
@@ -205,6 +206,7 @@ class EnsembleSampler(object):
             msg = f"not all values appear -- set should be 0 to {ndim-1}"
             assert values == set(np.arange(ndim)), msg
             self.parameter_names = parameter_names
+            self.temperature = temperature
 
     @property
     def random_state(self):
@@ -399,7 +401,7 @@ class EnsembleSampler(object):
                     move = self._random.choice(self._moves, p=self._weights)
 
                     # Propose
-                    state, accepted = move.propose(model, state)
+                    state, accepted = move.propose(model, state, temperature=temperature(i))
                     state.random_state = self.random_state
 
                     if tune:
